@@ -95,3 +95,89 @@ jobs:
           git add bambuddy-dev/config.yaml bambuddy-dev/CHANGELOG.md
           git diff --staged --quiet || git commit -m "chore: update BamBuddy Dev to ${{ steps.get_digest.outputs.version }}"
           git push
+
+  # ============================================================
+  # DEV2
+  # ============================================================
+  update-dev2:
+    name: Update DEV2
+    runs-on: ubuntu-latest
+    concurrency:
+      group: update-dev2
+      cancel-in-progress: true
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+
+      - name: Get latest dev2 image digest
+        id: get_digest
+        run: |
+          TOKEN=$(curl -s "https://ghcr.io/token?scope=repository:magicmelody84/bambuddy:pull" \
+            | jq -r '.token')
+
+          DIGEST=$(curl -sI -H "Authorization: Bearer $TOKEN" \
+            -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
+            -H "Accept: application/vnd.docker.distribution.manifest.list.v2+json" \
+            -H "Accept: application/vnd.oci.image.index.v1+json" \
+            -H "Accept: application/vnd.oci.image.manifest.v1+json" \
+            "https://ghcr.io/v2/magicmelody84/bambuddy/manifests/dev2" \
+            | grep -i "docker-content-digest" | tr -d '\r' | awk '{print $2}')
+
+          if [ -z "$DIGEST" ]; then
+            echo "ERROR: Digest could not be fetched!"
+            exit 1
+          fi
+
+          SHORT=$(echo "$DIGEST" | cut -c8-15)
+          DATE=$(date +%Y.%m.%d)
+
+          echo "digest=$DIGEST" >> $GITHUB_OUTPUT
+          echo "version=${DATE}-${SHORT}" >> $GITHUB_OUTPUT
+          echo "Digest: $DIGEST"
+          echo "Version: ${DATE}-${SHORT}"
+
+      - name: Get last-seen digest from config.yaml
+        id: get_current
+        run: |
+          CURRENT=$(grep '^# image-digest:' bambuddy-dev2/config.yaml | sed 's/^# image-digest: *//')
+          echo "current=$CURRENT" >> $GITHUB_OUTPUT
+          echo "Last-seen digest: $CURRENT"
+
+      - name: Update config.yaml
+        if: steps.get_digest.outputs.digest != steps.get_current.outputs.current
+        run: |
+          sed -i 's/^version: ".*"/version: "${{ steps.get_digest.outputs.version }}"/' bambuddy-dev2/config.yaml
+          if grep -q '^# image-digest:' bambuddy-dev2/config.yaml; then
+            sed -i "s|^# image-digest:.*|# image-digest: ${{ steps.get_digest.outputs.digest }}|" bambuddy-dev2/config.yaml
+          else
+            sed -i "1a # image-digest: ${{ steps.get_digest.outputs.digest }}" bambuddy-dev2/config.yaml
+          fi
+
+      - name: Update CHANGELOG.md
+        if: steps.get_digest.outputs.digest != steps.get_current.outputs.current
+        run: |
+          python3 - <<'PYEOF'
+          import os
+          from datetime import datetime, timezone
+          version = os.environ.get("NEW_VERSION", "")
+          digest = os.environ.get("NEW_DIGEST", "")
+          ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+          with open("bambuddy-dev2/CHANGELOG.md", "w") as f:
+              f.write(f"## {version}\n\nNew dev2 image detected ({ts}).\nImage: ghcr.io/magicmelody84/bambuddy:dev2@{digest}\n\n")
+          print("CHANGELOG.md updated")
+          PYEOF
+        env:
+          NEW_VERSION: ${{ steps.get_digest.outputs.version }}
+          NEW_DIGEST: ${{ steps.get_digest.outputs.digest }}
+
+      - name: Commit and push
+        if: steps.get_digest.outputs.digest != steps.get_current.outputs.current
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add bambuddy-dev2/config.yaml bambuddy-dev2/CHANGELOG.md
+          git diff --staged --quiet || git commit -m "chore: update BamBuddy Dev2 to ${{ steps.get_digest.outputs.version }}"
+          git push
