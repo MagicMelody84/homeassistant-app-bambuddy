@@ -1,7 +1,7 @@
 # https://developers.home-assistant.io/docs/add-ons/configuration#add-on-config
-# image-digest: sha256:d2020177dc04ed6b5eca9117f8154e24dd539ee6b58a5c33be412a9271207b15
+# image-digest: sha256:060347c08d2a1818c667a215587fce7eb56b1f5387e258a7df814587e559eaf9
 name: Bambuddy (Dev)
-version: "2026.08.09-d2020177"
+version: "2026.08.09-060347c0"
 slug: bambuddy_dev
 stage: experimental
 description: Bambuddy is a powerful, self-hosted command center for Bambu Lab — from one A1 to a 40-printer farm. Your Printers. No Cloud. Your Rules.
