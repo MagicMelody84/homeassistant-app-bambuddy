@@ -36,5 +36,5 @@ schema:
   debug: bool
 environment:
   TRUSTED_FRAME_ORIGINS: "{{trusted_frame_origins}}"
-webui: http://[HOST]:[PORT:8888]
-watchdog: http://[HOST]:[PORT:8888]/health
+webui: http://[HOST]:[PORT:9999]
+watchdog: http://[HOST]:[PORT:9999]/health
