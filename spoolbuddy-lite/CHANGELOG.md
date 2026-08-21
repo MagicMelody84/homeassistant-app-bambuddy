@@ -1,5 +1,5 @@
-## 2026.08.21-69a2f2df
+## 2026.08.21-7221acc8
 
-New spoolbuddy-lite image detected (2026-08-21 09:41 UTC).
-Image: ghcr.io/magicmelody84/bambuddy:spoolbuddy-lite@sha256:69a2f2df0695b516ed25fcad6f157e096064d135fb955c324bdf6177e1983aff
+New spoolbuddy-lite image detected (2026-08-21 09:55 UTC).
+Image: ghcr.io/magicmelody84/bambuddy:spoolbuddy-lite@sha256:7221acc80aa504ebb33e86a41703a6e1ecd7ca27285c2737e26efe1e1e7b0085
 
