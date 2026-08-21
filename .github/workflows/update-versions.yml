@@ -97,13 +97,13 @@ jobs:
           git push
 
   # ============================================================
-  # DEV2
+  # SPOOLBUDDY-LITE
   # ============================================================
-  update-dev2:
-    name: Update DEV2
+  update-spoolbuddy-lite:
+    name: Update SpoolBuddy Lite
     runs-on: ubuntu-latest
     concurrency:
-      group: update-dev2
+      group: update-spoolbuddy-lite
       cancel-in-progress: true
     permissions:
       contents: write
@@ -112,7 +112,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4.2.2
 
-      - name: Get latest dev2 image digest
+      - name: Get latest spoolbuddy-lite image digest
         id: get_digest
         run: |
           TOKEN=$(curl -s "https://ghcr.io/token?scope=repository:magicmelody84/bambuddy:pull" \
@@ -123,7 +123,7 @@ jobs:
             -H "Accept: application/vnd.docker.distribution.manifest.list.v2+json" \
             -H "Accept: application/vnd.oci.image.index.v1+json" \
             -H "Accept: application/vnd.oci.image.manifest.v1+json" \
-            "https://ghcr.io/v2/magicmelody84/bambuddy/manifests/dev2" \
+            "https://ghcr.io/v2/magicmelody84/bambuddy/manifests/spoolbuddy-lite" \
             | grep -i "docker-content-digest" | tr -d '\r' | awk '{print $2}')
 
           if [ -z "$DIGEST" ]; then
@@ -142,18 +142,18 @@ jobs:
       - name: Get last-seen digest from config.yaml
         id: get_current
         run: |
-          CURRENT=$(grep '^# image-digest:' bambuddy-dev2/config.yaml | sed 's/^# image-digest: *//')
+          CURRENT=$(grep '^# image-digest:' spoolbuddy-lite/config.yaml | sed 's/^# image-digest: *//')
           echo "current=$CURRENT" >> $GITHUB_OUTPUT
           echo "Last-seen digest: $CURRENT"
 
       - name: Update config.yaml
         if: steps.get_digest.outputs.digest != steps.get_current.outputs.current
         run: |
-          sed -i 's/^version: ".*"/version: "${{ steps.get_digest.outputs.version }}"/' bambuddy-dev2/config.yaml
-          if grep -q '^# image-digest:' bambuddy-dev2/config.yaml; then
-            sed -i "s|^# image-digest:.*|# image-digest: ${{ steps.get_digest.outputs.digest }}|" bambuddy-dev2/config.yaml
+          sed -i 's/^version: ".*"/version: "${{ steps.get_digest.outputs.version }}"/' spoolbuddy-lite/config.yaml
+          if grep -q '^# image-digest:' spoolbuddy-lite/config.yaml; then
+            sed -i "s|^# image-digest:.*|# image-digest: ${{ steps.get_digest.outputs.digest }}|" spoolbuddy-lite/config.yaml
           else
-            sed -i "1a # image-digest: ${{ steps.get_digest.outputs.digest }}" bambuddy-dev2/config.yaml
+            sed -i "1a # image-digest: ${{ steps.get_digest.outputs.digest }}" spoolbuddy-lite/config.yaml
           fi
 
       - name: Update CHANGELOG.md
@@ -165,8 +165,8 @@ jobs:
           version = os.environ.get("NEW_VERSION", "")
           digest = os.environ.get("NEW_DIGEST", "")
           ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
-          with open("bambuddy-dev2/CHANGELOG.md", "w") as f:
-              f.write(f"## {version}\n\nNew dev2 image detected ({ts}).\nImage: ghcr.io/magicmelody84/bambuddy:dev2@{digest}\n\n")
+          with open("spoolbuddy-lite/CHANGELOG.md", "w") as f:
+              f.write(f"## {version}\n\nNew spoolbuddy-lite image detected ({ts}).\nImage: ghcr.io/magicmelody84/bambuddy:spoolbuddy-lite@{digest}\n\n")
           print("CHANGELOG.md updated")
           PYEOF
         env:
@@ -178,6 +178,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add bambuddy-dev2/config.yaml bambuddy-dev2/CHANGELOG.md
-          git diff --staged --quiet || git commit -m "chore: update BamBuddy Dev2 to ${{ steps.get_digest.outputs.version }}"
+          git add spoolbuddy-lite/config.yaml spoolbuddy-lite/CHANGELOG.md
+          git diff --staged --quiet || git commit -m "chore: update SpoolBuddy Lite to ${{ steps.get_digest.outputs.version }}"
           git push

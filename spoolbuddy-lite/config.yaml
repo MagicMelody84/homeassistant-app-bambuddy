@@ -1,8 +1,7 @@
 # https://developers.home-assistant.io/docs/add-ons/configuration#add-on-config
-# image-digest: sha256:214ea7920204b8d8dda4b3b2d4a4a84ed20d6f6a996e92c06705e1357e8e3358
-name: Bambuddy (Dev2)
-version: "2026.08.10-214ea792"
-slug: bambuddy_dev2
+name: SpoolBuddy Lite
+version: "0.0.0"
+slug: spoolbuddy_lite
 stage: experimental
 description: Bambuddy is a powerful, self-hosted command center for Bambu Lab — from one A1 to a 40-printer farm. Your Printers. No Cloud. Your Rules.
 url: "https://github.com/MagicMelody84/homeassistant-app-bambuddy"
