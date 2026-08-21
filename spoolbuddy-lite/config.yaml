@@ -1,6 +1,7 @@
 # https://developers.home-assistant.io/docs/add-ons/configuration#add-on-config
+# image-digest: sha256:8d9d14ba943e880f45e662b3494f6f036629896f11a9a2590aaac15dc4c7a48a
 name: SpoolBuddy Lite
-version: "0.0.0"
+version: "2026.08.21-8d9d14ba"
 slug: spoolbuddy_lite
 stage: experimental
 description: Bambuddy is a powerful, self-hosted command center for Bambu Lab — from one A1 to a 40-printer farm. Your Printers. No Cloud. Your Rules.
